@@ -1,1 +1,1 @@
-User stories for GiftLink project
+https://github.com/kelardmavoungou-design/fullstack-capstone-project
