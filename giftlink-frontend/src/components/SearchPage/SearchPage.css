@@ -1,26 +1,199 @@
 /* Task 1: Style the search input field */
 .search-input {
-    /* Insert specific CSS properties here */
+    width: 75%;
+    margin-right: 1rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
 /* Task 2: Style the search button */
 .search-button {
-    /* Insert specific CSS properties here */
+    width: 20%;
+    background-color: #007bff;
+    color: #ffffff;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-button:hover {
+    background-color: #0056b3;
+}
+
+.search-button:active {
+    background-color: #004085;
 }
 
 /* Task 3: Customize dropdown filters */
 .dropdown-filter {
-    /* Insert specific CSS properties here */
+    margin-bottom: 1rem;
+    border: 1px solid #ced4da;
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.25rem;
+    font-size: 0.95rem;
+    width: 100%;
+    background-color: #ffffff;
+    color: #495057;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.dropdown-filter:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
 /* Task 4: Style the age range slider */
 .age-range-slider {
-    /* Insert specific CSS properties here */
+    width: 100%;
+    margin-top: 0.5rem;
+    accent-color: #007bff;
+    cursor: pointer;
 }
 
 /* Task 5: Enhance search results cards appearance */
 .search-results-card {
-    /* Insert specific CSS properties here */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    border: none;
+    margin-bottom: 1.5rem;
+    background-color: #ffffff;
+    transition: box-shadow 0.3s ease-in-out;
 }
 
-/* Additional placeholders for tasks 6 to 10 */
+/* Task 6: Style the "No products found" alert message */
+.no-results-alert {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 0.75rem 1.25rem;
+    margin-top: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+/* Task 7: Hover effect on search results cards */
+.search-results-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Task 8: Images in search results displayed appropriately */
+.search-results-card .card-img-top {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+/* Task 9: Responsive layout for search results */
+@media (max-width: 768px) {
+    .search-input {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 0.75rem;
+    }
+
+    .search-button {
+        width: 100%;
+    }
+
+    .search-results-card {
+        border-radius: 6px;
+    }
+
+    .search-results-card .card-img-top {
+        height: 160px;
+    }
+
+    .search-results-card .card-title {
+        font-size: 1rem;
+    }
+
+    .search-results-card .card-text {
+        font-size: 0.875rem;
+    }
+
+    .dropdown-filter {
+        font-size: 0.875rem;
+    }
+}
+
+/* Task 10: Overall page styling */
+body {
+    background-color: #f4f6f9;
+    color: #343a40;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+    max-width: 900px;
+}
+
+.filter-section {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 1.25rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filter-section h5 {
+    color: #007bff;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 0.5rem;
+}
+
+.search-results {
+    padding-top: 0.5rem;
+}
+
+.card-body {
+    padding: 1rem 1.25rem;
+}
+
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #343a40;
+}
+
+.card-text {
+    font-size: 0.9rem;
+    color: #6c757d;
+    line-height: 1.5;
+}
+
+.card-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    padding: 0.75rem 1.25rem;
+}
+
+.card-footer .btn-primary {
+    background-color: #007bff;
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.card-footer .btn-primary:hover {
+    background-color: #0056b3;
+}
