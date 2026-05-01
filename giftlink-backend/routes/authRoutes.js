@@ -1,37 +1,39 @@
-// Step 1 - Task 2: Import necessary packages
 const express = require('express');
-const app = express();
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { body, validationResult } = require('express-validator');
 const connectToDatabase = require('../models/db');
 const router = express.Router();
 const dotenv = require('dotenv');
-const pino = require('pino');
-
-// Step 1 - Task 3: Create a Pino logger instance
-const logger = pino();
-
+const pino = require('pino');  // Import Pino logger
 dotenv.config();
 
-// Step 1 - Task 4: Create JWT secret
+const logger = pino();  // Create a Pino logger instance
+
+//Create JWT secret
+dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// ─── REGISTER ────────────────────────────────────────────────────────────────
 router.post('/register', async (req, res) => {
     try {
-        const db = await connectToDatabase();
-        const collection = db.collection("users");
+      //Connect to `giftsdb` in MongoDB through `connectToDatabase` in `db.js`.
+	  const db = await connectToDatabase();
 
-        const existingEmail = await collection.findOne({ email: req.body.email });
+	  //Access the `users` collection
+      const collection = db.collection("users");
+
+	  //Check for existing email in DB
+      const existingEmail = await collection.findOne({ email: req.body.email });
+
         if (existingEmail) {
+            logger.error('Email id already exists');
             return res.status(400).json({ error: 'Email id already exists' });
         }
 
         const salt = await bcryptjs.genSalt(10);
         const hash = await bcryptjs.hash(req.body.password, salt);
-        const email = req.body.email;
+        const email=req.body.email;
 
+		//Save user details
         const newUser = await collection.insertOne({
             email: req.body.email,
             firstName: req.body.firstName,
@@ -46,59 +48,52 @@ router.post('/register', async (req, res) => {
             },
         };
 
+		//Create JWT
         const authtoken = jwt.sign(payload, JWT_SECRET);
         logger.info('User registered successfully');
-        res.json({ authtoken, email });
-
+        res.json({ authtoken,email });
     } catch (e) {
+        logger.error(e);
         return res.status(500).send('Internal server error');
     }
 });
 
-// ─── LOGIN ────────────────────────────────────────────────────────────────────
+	//Login Endpoint
 router.post('/login', async (req, res) => {
+    console.log("\n\n Inside login")
+
     try {
-        // Task 1: Connexion à MongoDB
+        // const collection = await connectToDatabase();
         const db = await connectToDatabase();
-
-        // Task 2: Accès à la collection users
         const collection = db.collection("users");
-
-        // Task 3: Chercher l'utilisateur par email
         const theUser = await collection.findOne({ email: req.body.email });
 
         if (theUser) {
-            // Task 4: Vérifier si le mot de passe correspond
-            let result = await bcryptjs.compare(req.body.password, theUser.password);
-            if (!result) {
+            let result = await bcryptjs.compare(req.body.password, theUser.password)
+            if(!result) {
                 logger.error('Passwords do not match');
-                return res.status(404).json({ error: 'Wrong password' });
+                return res.status(404).json({ error: 'Wrong pasword' });
             }
-
-            // Task 5: Récupérer les détails de l'utilisateur
-            const userName = theUser.firstName;
-            const userEmail = theUser.email;
-
-            // Task 6: Créer le JWT avec user._id comme payload
             let payload = {
                 user: {
                     id: theUser._id.toString(),
                 },
             };
+
+            const userName = theUser.firstName;
+            const userEmail = theUser.email;
+
             const authtoken = jwt.sign(payload, JWT_SECRET);
-
             logger.info('User logged in successfully');
-            res.json({ authtoken, userName, userEmail });
-
+            return res.status(200).json({ authtoken, userName, userEmail });
         } else {
-            // Task 7: Utilisateur non trouvé
             logger.error('User not found');
             return res.status(404).json({ error: 'User not found' });
         }
-
     } catch (e) {
-        return res.status(500).send('Internal server error');
-    }
+        logger.error(e);
+        return res.status(500).json({ error: 'Internal server error', details: e.message });
+      }
 });
 
 module.exports = router;
