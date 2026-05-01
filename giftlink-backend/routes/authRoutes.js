@@ -7,25 +7,22 @@ const { body, validationResult } = require('express-validator');
 const connectToDatabase = require('../models/db');
 const router = express.Router();
 const dotenv = require('dotenv');
-const pino = require('pino'); // Import Pino logger
+const pino = require('pino');
 
 // Step 1 - Task 3: Create a Pino logger instance
-const logger = pino(); // Create a Pino logger instance
+const logger = pino();
 
 dotenv.config();
 
 // Step 1 - Task 4: Create JWT secret
 const JWT_SECRET = process.env.JWT_SECRET;
 
+// ─── REGISTER ────────────────────────────────────────────────────────────────
 router.post('/register', async (req, res) => {
     try {
-        // Task 1: Connect to `giftsdb` in MongoDB through `connectToDatabase` in `db.js`
         const db = await connectToDatabase();
-
-        // Task 2: Access MongoDB collection
         const collection = db.collection("users");
 
-        // Task 3: Check for existing email
         const existingEmail = await collection.findOne({ email: req.body.email });
         if (existingEmail) {
             return res.status(400).json({ error: 'Email id already exists' });
@@ -35,7 +32,6 @@ router.post('/register', async (req, res) => {
         const hash = await bcryptjs.hash(req.body.password, salt);
         const email = req.body.email;
 
-        // Task 4: Save user details in database
         const newUser = await collection.insertOne({
             email: req.body.email,
             firstName: req.body.firstName,
@@ -44,7 +40,6 @@ router.post('/register', async (req, res) => {
             createdAt: new Date(),
         });
 
-        // Task 5: Create JWT authentication with user._id as payload
         const payload = {
             user: {
                 id: newUser.insertedId,
@@ -52,9 +47,55 @@ router.post('/register', async (req, res) => {
         };
 
         const authtoken = jwt.sign(payload, JWT_SECRET);
-
         logger.info('User registered successfully');
         res.json({ authtoken, email });
+
+    } catch (e) {
+        return res.status(500).send('Internal server error');
+    }
+});
+
+// ─── LOGIN ────────────────────────────────────────────────────────────────────
+router.post('/login', async (req, res) => {
+    try {
+        // Task 1: Connexion à MongoDB
+        const db = await connectToDatabase();
+
+        // Task 2: Accès à la collection users
+        const collection = db.collection("users");
+
+        // Task 3: Chercher l'utilisateur par email
+        const theUser = await collection.findOne({ email: req.body.email });
+
+        if (theUser) {
+            // Task 4: Vérifier si le mot de passe correspond
+            let result = await bcryptjs.compare(req.body.password, theUser.password);
+            if (!result) {
+                logger.error('Passwords do not match');
+                return res.status(404).json({ error: 'Wrong password' });
+            }
+
+            // Task 5: Récupérer les détails de l'utilisateur
+            const userName = theUser.firstName;
+            const userEmail = theUser.email;
+
+            // Task 6: Créer le JWT avec user._id comme payload
+            let payload = {
+                user: {
+                    id: theUser._id.toString(),
+                },
+            };
+            const authtoken = jwt.sign(payload, JWT_SECRET);
+
+            logger.info('User logged in successfully');
+            res.json({ authtoken, userName, userEmail });
+
+        } else {
+            // Task 7: Utilisateur non trouvé
+            logger.error('User not found');
+            return res.status(404).json({ error: 'User not found' });
+        }
+
     } catch (e) {
         return res.status(500).send('Internal server error');
     }
