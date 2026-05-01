@@ -1,18 +1,55 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { urlConfig } from '../../config';
+import { useAppContext } from '../../context/AuthContext';
 import './RegisterPage.css';
 
 function RegisterPage() {
 
-    // useState hook variables for firstName, lastName, email, password
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showerr, setShowerr] = useState('');          // renommé pour Task 6
 
-    // handleRegister function
+    const navigate = useNavigate();
+    const { setIsLoggedIn } = useAppContext();
+
     const handleRegister = async () => {
-        console.log("Register invoked");
+        try {
+            const response = await fetch(`${urlConfig.backendUrl}/api/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json',
+                },
+                body: JSON.stringify({
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    password: password
+                })
+            });
+
+            const json = await response.json();          // Task 1: accès aux données JSON
+
+            if (json.authtoken) {
+                // Task 2: Sauvegarder les détails utilisateur en session
+                sessionStorage.setItem('auth-token', json.authtoken);
+                sessionStorage.setItem('name', firstName);
+                sessionStorage.setItem('email', json.email);
+
+                setIsLoggedIn(true);                     // Task 3: mettre à jour le statut de connexion
+                navigate('/app');                        // Task 4: rediriger vers MainPage
+            }
+
+            if (json.error) {
+                setShowerr(json.error);                  // Task 5: message d'erreur si échec
+            }
+
+        } catch (e) {
+            console.log("Error fetching details: " + e.message);
+        }
     };
 
     return (
@@ -74,6 +111,9 @@ function RegisterPage() {
                             />
                         </div>
 
+                        {/* Task 6: Affichage du message d'erreur */}
+                        <div className="text-danger">{showerr}</div>
+
                         {/* Register button */}
                         <button
                             className="btn btn-primary w-100 mb-3"
@@ -90,7 +130,7 @@ function RegisterPage() {
                 </div>
             </div>
         </div>
-    ); // end of return
+    );
 }
 
 export default RegisterPage;
